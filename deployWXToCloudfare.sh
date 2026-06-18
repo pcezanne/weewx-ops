@@ -12,8 +12,9 @@ PROJECT_NAME="wx-notthepainter"
 LOG="/Library/Logs/weewx-cloudflare.out"
 
 # --- AUTH ---
-export CLOUDFLARE_API_TOKEN="YOUR_CLOUDFLARE_API_TOKEN"
-export CLOUDFLARE_ACCOUNT_ID="YOUR_CLOUDFLARE_ACCOUNT_ID"
+source /usr/local/etc/weewx/.env
+export CLOUDFLARE_API_TOKEN
+export CLOUDFLARE_ACCOUNT_ID
 export CI=true
 
 # --- 1. SETTLE TIME ---
@@ -52,7 +53,7 @@ REMOTE_NAME="cloudflare:pcezanne-weather-backups"
 $RCLONE_BIN --config "$RCLONE_CONF" sync "$SOURCE_DIR" "$REMOTE_NAME" -v
 
 # Ping the heartbeat
-/usr/bin/curl -m 10 --retry 5 https://hc-ping.com/YOUR_HEALTHCHECK_UUID
+/usr/bin/curl -m 10 --retry 5 "https://hc-ping.com/${HEALTHCHECK_UUID}"
 
 # --- CLEANUP ---
 rm -f "$LOCKFILE"
