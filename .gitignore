@@ -1,6 +1,9 @@
 # Secrets — never commit
 .env
 
+# Claude Code settings
+.claude/
+
 # iCloud stubs
 *.icloud
 
