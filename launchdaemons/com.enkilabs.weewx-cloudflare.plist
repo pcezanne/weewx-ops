@@ -19,6 +19,10 @@
     	<string>/Users/Shared/weewx-output/deployment-complete.txt</string>
 	</array>
 
+  <!-- Minimum seconds between triggers; deploy script also has a lockfile -->
+  <key>ThrottleInterval</key>
+  <integer>60</integer>
+
   <!-- Logs -->
   <key>StandardOutPath</key>
   <string>/Library/Logs/weewx-cloudflare.out</string>

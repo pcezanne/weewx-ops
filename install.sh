@@ -21,17 +21,20 @@ sudo cp "$ENV_FILE" /usr/local/etc/weewx/.env
 sudo chmod 600 /usr/local/etc/weewx/.env
 
 echo "Installing weewx.conf (with credential substitution)..."
-envsubst '${WU_PASSWORD}' < "$SCRIPT_DIR/weewx.conf" | sudo tee "$WEEWX_CONF_DIR/weewx.conf" > /dev/null
+envsubst '${WU_PASSWORD}' < "$SCRIPT_DIR/config/weewx.conf" | sudo tee "$WEEWX_CONF_DIR/weewx.conf" > /dev/null
 
-echo "Installing deploy and backup scripts..."
-sudo cp "$SCRIPT_DIR/deployWXToCloudflare.sh" "$WEEWX_BIN/deployWXToCloudflare.sh"
+echo "Installing scripts..."
+sudo cp "$SCRIPT_DIR/scripts/deployWXToCloudflare.sh" "$WEEWX_BIN/deployWXToCloudflare.sh"
 sudo chmod +x "$WEEWX_BIN/deployWXToCloudflare.sh"
-sudo cp "$SCRIPT_DIR/rotateBackups.sh" "$WEEWX_BIN/rotateBackups.sh"
+sudo cp "$SCRIPT_DIR/scripts/rotateBackups.sh" "$WEEWX_BIN/rotateBackups.sh"
 sudo chmod +x "$WEEWX_BIN/rotateBackups.sh"
 
 echo "Installing LaunchDaemons..."
 for plist in com.weewx.weewxd.plist com.enkilabs.weewx-cloudflare.plist com.enkilabs.weewx-backup.plist com.enkilabs.caffeinate.plist; do
-    sudo cp "$SCRIPT_DIR/$plist" "$LAUNCH_DAEMONS/$plist"
+    sudo cp "$SCRIPT_DIR/launchdaemons/$plist" "$LAUNCH_DAEMONS/$plist"
+    echo "  Reloading $plist..."
+    sudo launchctl unload "$LAUNCH_DAEMONS/$plist" 2>/dev/null || true
+    sudo launchctl load "$LAUNCH_DAEMONS/$plist"
 done
 
-echo "Done. Run 'sudo launchctl load /Library/LaunchDaemons/<plist>' to activate any new daemons."
+echo "Done."

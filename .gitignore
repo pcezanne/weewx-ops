@@ -4,7 +4,8 @@
 # Claude Code settings
 .claude/
 
-# iCloud stubs
+# macOS
+.DS_Store
 *.icloud
 
 # Logs
