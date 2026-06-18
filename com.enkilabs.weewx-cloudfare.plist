@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+  <!-- This should be in /Library/LaunchDaemons/com.enkilabs.weewx-cloudflare.plist -->
+
+  <key>Label</key>
+  <string>com.enkilabs.weewx-cloudflare</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/deployWXToCloudfare.sh</string>
+  </array>
+
+	<key>WatchPaths</key>
+	<array>
+    	<string>/Users/Shared/weewx-output/deployment-complete.txt</string>
+	</array>
+
+  <!-- Logs -->
+  <key>StandardOutPath</key>
+  <string>/Library/Logs/weewx-cloudflare.out</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Library/Logs/weewx-cloudflare.err</string>
+
+</dict>
+</plist>

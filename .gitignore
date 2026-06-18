@@ -1,0 +1,7 @@
+# iCloud stubs
+*.icloud
+
+# Logs
+*.log
+*.out
+*.err
