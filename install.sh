@@ -24,13 +24,13 @@ echo "Installing weewx.conf (with credential substitution)..."
 envsubst '${WU_PASSWORD}' < "$SCRIPT_DIR/weewx.conf" | sudo tee "$WEEWX_CONF_DIR/weewx.conf" > /dev/null
 
 echo "Installing deploy and backup scripts..."
-sudo cp "$SCRIPT_DIR/deployWXToCloudfare.sh" "$WEEWX_BIN/deployWXToCloudfare.sh"
-sudo chmod +x "$WEEWX_BIN/deployWXToCloudfare.sh"
+sudo cp "$SCRIPT_DIR/deployWXToCloudflare.sh" "$WEEWX_BIN/deployWXToCloudflare.sh"
+sudo chmod +x "$WEEWX_BIN/deployWXToCloudflare.sh"
 sudo cp "$SCRIPT_DIR/rotateBackups.sh" "$WEEWX_BIN/rotateBackups.sh"
 sudo chmod +x "$WEEWX_BIN/rotateBackups.sh"
 
 echo "Installing LaunchDaemons..."
-for plist in com.weewx.weewxd.plist com.enkilabs.weewx-cloudfare.plist com.enkilabs.weewx-backup.plist com.enkilabs.caffeinate.plist; do
+for plist in com.weewx.weewxd.plist com.enkilabs.weewx-cloudflare.plist com.enkilabs.weewx-backup.plist com.enkilabs.caffeinate.plist; do
     sudo cp "$SCRIPT_DIR/$plist" "$LAUNCH_DAEMONS/$plist"
 done
 

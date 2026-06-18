@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# This should be in /usr/local/bin/deployWXToCloudfare.sh
+# This should be in /usr/local/bin/deployWXToCloudflare.sh
 #
 export PATH="/opt/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 

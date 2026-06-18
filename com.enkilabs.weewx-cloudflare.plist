@@ -11,7 +11,7 @@
 
   <key>ProgramArguments</key>
   <array>
-    <string>/usr/local/bin/deployWXToCloudfare.sh</string>
+    <string>/usr/local/bin/deployWXToCloudflare.sh</string>
   </array>
 
 	<key>WatchPaths</key>
