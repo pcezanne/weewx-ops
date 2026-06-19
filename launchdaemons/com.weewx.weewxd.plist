@@ -34,6 +34,8 @@
     <string>/usr/local/weewx-venv/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     <key>WEEWX_BINDIR</key>
     <string>/usr/local/weewx-venv/bin</string>
+    <key>SSL_CERT_FILE</key>
+    <string>/usr/local/weewx-venv/lib/python3.14/site-packages/certifi/cacert.pem</string>
 </dict>
 
 </dict>
