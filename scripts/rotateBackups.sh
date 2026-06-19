@@ -46,8 +46,8 @@ echo "$(date): Monthly retention pruned (>365 days)"
 
 echo "$(date): Backup complete."
 
+sync_ok=false
 if [ -n "${RCLONE_REMOTE:-}" ]; then
-    sync_ok=false
     for attempt in 1 2 3; do
         if "$RCLONE_BIN" --config "$RCLONE_CONF" sync "$BACKUP_DIR" "$RCLONE_REMOTE" -v; then
             echo "$(date): R2 sync complete."
@@ -59,5 +59,13 @@ if [ -n "${RCLONE_REMOTE:-}" ]; then
     done
     if ! $sync_ok; then
         echo "$(date): WARNING: R2 sync failed after 3 attempts. Local backup is intact."
+    fi
+fi
+
+if [ -n "${BACKUP_HEALTHCHECK_UUID:-}" ]; then
+    if $sync_ok; then
+        /usr/bin/curl -fsS -m 10 --retry 5 "https://hc-ping.com/${BACKUP_HEALTHCHECK_UUID}" > /dev/null || true
+    else
+        /usr/bin/curl -fsS -m 10 --retry 5 "https://hc-ping.com/${BACKUP_HEALTHCHECK_UUID}/fail" > /dev/null || true
     fi
 fi
