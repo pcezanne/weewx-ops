@@ -36,7 +36,7 @@ envsubst '${WU_PASSWORD} ${WU_STATION_ID} ${WEEWX_LOCATION} ${WEEWX_LATITUDE} ${
     < "$SCRIPT_DIR/config/weewx.conf" | sudo tee "$WEEWX_CONF_DIR/weewx.conf" > /dev/null
 
 echo "Installing scripts..."
-for script in deployWXToCloudflare.sh rotateBackups.sh stop.sh; do
+for script in deployWXToCloudflare.sh rotateBackups.sh; do
     sudo cp "$SCRIPT_DIR/scripts/$script" "$WEEWX_BIN/$script"
     sudo chmod +x "$WEEWX_BIN/$script"
 done
