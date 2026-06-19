@@ -112,12 +112,6 @@ If WeeWX fails with `ModuleNotFoundError`, the virtualenv is disposable:
 4. `/usr/local/weewx-venv/bin/pip install weewx requests pyserial six certifi`
 5. Reinstall the ecowitt_http driver into the venv.
 
-### Ghost Path Exorcism
-
-Default WeeWX templates may embed user home directory paths, triggering macOS TCC security blocks. If WeeWX is denied filesystem access, scan and fix with:
-
-`sudo find /usr/local/etc/weewx/ -type f -exec grep -l '/Users/' {} \; | xargs -I{} sudo sed -i '' 's|/Users/.*/WeeWX|/usr/local|g' {}`
-
 ### Driver Reconfiguration
 
 When rebuilding or migrating hardware, relink the station driver explicitly:
