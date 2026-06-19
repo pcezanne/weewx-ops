@@ -36,10 +36,10 @@ envsubst '${WU_PASSWORD} ${WU_STATION_ID} ${WEEWX_LOCATION} ${WEEWX_LATITUDE} ${
     < "$SCRIPT_DIR/config/weewx.conf" | sudo tee "$WEEWX_CONF_DIR/weewx.conf" > /dev/null
 
 echo "Installing scripts..."
-sudo cp "$SCRIPT_DIR/scripts/deployWXToCloudflare.sh" "$WEEWX_BIN/deployWXToCloudflare.sh"
-sudo chmod +x "$WEEWX_BIN/deployWXToCloudflare.sh"
-sudo cp "$SCRIPT_DIR/scripts/rotateBackups.sh" "$WEEWX_BIN/rotateBackups.sh"
-sudo chmod +x "$WEEWX_BIN/rotateBackups.sh"
+for script in deployWXToCloudflare.sh rotateBackups.sh stop.sh; do
+    sudo cp "$SCRIPT_DIR/scripts/$script" "$WEEWX_BIN/$script"
+    sudo chmod +x "$WEEWX_BIN/$script"
+done
 
 if [ "$OS" = "Darwin" ]; then
     LAUNCH_DAEMONS="/Library/LaunchDaemons"
