@@ -109,7 +109,7 @@ If WeeWX fails with `ModuleNotFoundError`, the virtualenv is disposable:
 1. `sudo rm -rf /usr/local/weewx-venv`
 2. `sudo python3 -m venv /usr/local/weewx-venv`
 3. `sudo chown -R $(whoami):staff /usr/local/weewx-venv`
-4. `/usr/local/weewx-venv/bin/pip install weewx requests pyserial six`
+4. `/usr/local/weewx-venv/bin/pip install weewx requests pyserial six certifi`
 5. Reinstall the ecowitt_http driver into the venv.
 
 ### Ghost Path Exorcism
