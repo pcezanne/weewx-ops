@@ -9,9 +9,6 @@ export PATH="/opt/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 # --- CONFIG ---
 WRANGLER="${WRANGLER:-/opt/local/bin/wrangler}"
 SOURCE_DIR="${SOURCE_DIR:-/Users/Shared/weewx-output}"
-BACKUP_DIR="${BACKUP_DIR:-/Users/Shared/Backup/Archive}"
-RCLONE_BIN="${RCLONE_BIN:-/usr/local/bin/rclone}"
-RCLONE_CONF="${RCLONE_CONF:-/Users/Shared/rclone/rclone.conf}"
 LOG="${LOG:-/Library/Logs/weewx-cloudflare.out}"
 LOCKFILE="${LOCKFILE:-/tmp/weewx-deploy.lock}"
 ENV_FILE="${ENV_FILE:-/usr/local/etc/weewx/.env}"
@@ -38,26 +35,15 @@ trap 'rm -f "$LOCKFILE"' EXIT
 # Give the filesystem 5 seconds to finish writing images/JSON
 sleep 5
 
-deploy_ok=true
-backup_ok=true
-
 # --- DEPLOY ---
 cd "$SOURCE_DIR"
 echo "$(date): Starting deploy..." >> "$LOG"
-/opt/local/bin/gtimeout 90s "$WRANGLER" pages deploy . \
-    --project-name "$PROJECT_NAME" --branch main --commit-dirty=true >> "$LOG" 2>&1 \
-    || { echo "$(date): Deploy FAILED" >> "$LOG"; deploy_ok=false; }
-
-# --- SYNC BACKUPS ---
-/opt/local/bin/gtimeout 120s "$RCLONE_BIN" --config "$RCLONE_CONF" \
-    sync "$BACKUP_DIR" "$REMOTE_NAME" -v >> "$LOG" 2>&1 \
-    || { echo "$(date): Backup sync FAILED" >> "$LOG"; backup_ok=false; }
-
-# --- HEARTBEAT ---
-if $deploy_ok && $backup_ok; then
+if /opt/local/bin/gtimeout 90s "$WRANGLER" pages deploy . \
+    --project-name "$PROJECT_NAME" --branch main --commit-dirty=true >> "$LOG" 2>&1; then
     /usr/bin/curl -fsS -m 10 --retry 5 "https://hc-ping.com/${HEALTHCHECK_UUID}" >> "$LOG" 2>&1 || true
     echo "$(date): Cycle complete." >> "$LOG"
 else
+    echo "$(date): Deploy FAILED" >> "$LOG"
     /usr/bin/curl -fsS -m 10 --retry 5 "https://hc-ping.com/${HEALTHCHECK_UUID}/fail" >> "$LOG" 2>&1 || true
     echo "$(date): Cycle finished with errors." >> "$LOG"
 fi
