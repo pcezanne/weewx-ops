@@ -27,9 +27,10 @@ set -a
 source "$ENV_FILE"
 set +a
 
-echo "Installing .env to /usr/local/etc/weewx/.env..."
-sudo cp "$ENV_FILE" /usr/local/etc/weewx/.env
-sudo chmod 600 /usr/local/etc/weewx/.env
+echo "Installing .env to $WEEWX_CONF_DIR/.env..."
+sudo mkdir -p "$WEEWX_CONF_DIR"
+sudo cp "$ENV_FILE" "$WEEWX_CONF_DIR/.env"
+sudo chmod 600 "$WEEWX_CONF_DIR/.env"
 
 echo "Installing weewx.conf (with credential substitution)..."
 envsubst '${WU_PASSWORD} ${WU_STATION_ID} ${WEEWX_LOCATION} ${WEEWX_LATITUDE} ${WEEWX_LONGITUDE} ${WEEWX_ALTITUDE} ${ECOWITT_IP} ${CLOUDFLARE_PROJECT_NAME} ${RCLONE_REMOTE}' \
