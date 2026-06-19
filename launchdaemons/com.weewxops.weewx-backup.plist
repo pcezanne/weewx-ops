@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.enkilabs.weewx-backup</string>
+    <string>com.weewxops.weewx-backup</string>
     <key>ProgramArguments</key>
     <array>
         <string>/usr/local/bin/rotateBackups.sh</string>

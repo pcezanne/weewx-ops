@@ -1,4 +1,4 @@
-# WeeWX Weather Station — wx.enkilabs.com
+# weewx-ops — WeeWX Production Operations Stack
 
 A high-availability, headless weather station running on macOS. Data is collected from an Ecowitt gateway, processed by WeeWX, and published to Cloudflare Pages. The system is designed for unattended, remote operation with off-site backups and uptime monitoring.
 
@@ -19,7 +19,7 @@ A high-availability, headless weather station running on macOS. Data is collecte
 The system is composed of five layers, each implemented as an independent macOS LaunchDaemon.
 
 ### Power Management
-**`launchdaemons/com.enkilabs.caffeinate.plist`**
+**`launchdaemons/com.weewxops.caffeinate.plist`**
 
 Keeps the Mac awake indefinitely using `caffeinate -sim` (system sleep, idle sleep, and disk sleep prevention). Required for reliable headless operation with the lid closed.
 
@@ -31,7 +31,7 @@ Runs `weewxd` under a Python virtualenv at `/usr/local/weewx-venv`. KeepAlive en
 WeeWX polls the Ecowitt gateway every 20 seconds via the local HTTP API (`user.ecowitt_http` driver). Archive records are written to SQLite every 5 minutes. On startup after a gap, the driver pulls history from the gateway's SD card to backfill missing records.
 
 ### Database Backup
-**`launchdaemons/com.enkilabs.weewx-backup.plist`** → **`scripts/rotateBackups.sh`**
+**`launchdaemons/com.weewxops.weewx-backup.plist`** → **`scripts/rotateBackups.sh`**
 
 Runs at midnight daily. Implements a simple rotation: 30 daily copies and 12 monthly copies (promoted on the 1st). Both tiers are synced to Cloudflare R2 by the deploy script.
 
@@ -39,7 +39,7 @@ To verify a backup without WeeWX:
 `sqlite3 /path/to/backup.sdb "PRAGMA integrity_check;"`
 
 ### Event-Driven Deployment
-**`launchdaemons/com.enkilabs.weewx-cloudflare.plist`** → **`scripts/deployWXToCloudflare.sh`**
+**`launchdaemons/com.weewxops.weewx-cloudflare.plist`** → **`scripts/deployWXToCloudflare.sh`**
 
 Uses `WatchPaths` to monitor `deployment-complete.txt` in the WeeWX output directory. When WeeWX finishes a report cycle, it writes this sentinel file, which triggers the deploy daemon — no polling, no cron race conditions.
 
@@ -77,7 +77,7 @@ install.sh       Deploys everything to its live location
 **Prerequisites:** WeeWX installed in `/usr/local/weewx-venv`, Wrangler at `/opt/local/bin/wrangler` (MacPorts), rclone at `/usr/local/bin/rclone`, an rclone config at `/Users/Shared/rclone/rclone.conf`.
 
 1. Clone this repo.
-2. Copy `.env.example` to `.env` and fill in all four credentials.
+2. Copy `.env.example` to `.env` and fill in all values — station identity, gateway IP, and all credentials.
 3. Create the shared directories:
    - `/Users/Shared/weewx-output`
    - `/Users/Shared/Backup/Archive/daily`
@@ -100,7 +100,7 @@ install.sh       Deploys everything to its live location
 
 **Quarantine blocking scripts** — Downloaded scripts may be flagged by Gatekeeper. Run `xattr -d com.apple.quarantine /path/to/script.sh` to unblock.
 
-**Lockfile left behind** — If `/tmp/weewx-deploy.lock` persists after a crash, remove it manually. The deploy script now uses a trap to prevent this, but a hard kill (SIGKILL) can still leave it.
+**Lockfile left behind** — If `/tmp/weewx-deploy.lock` persists after a crash, remove it manually. The deploy script uses a trap to prevent this, but a hard kill (SIGKILL) can still leave it.
 
 ### Venv Corruption
 
@@ -114,9 +114,9 @@ If WeeWX fails with `ModuleNotFoundError`, the virtualenv is disposable:
 
 ### Ghost Path Exorcism
 
-Default WeeWX templates may embed `~/Documents` paths, triggering macOS TCC security blocks. If WeeWX is denied filesystem access, scan and fix with:
+Default WeeWX templates may embed user home directory paths, triggering macOS TCC security blocks. If WeeWX is denied filesystem access, scan and fix with:
 
-`sudo find /usr/local/etc/weewx/ -type f -exec sed -i '' 's|/Users/pcezanne/Documents/WeeWX|/usr/local|g' {} +`
+`sudo find /usr/local/etc/weewx/ -type f -exec grep -l '/Users/' {} \; | xargs -I{} sudo sed -i '' 's|/Users/.*/WeeWX|/usr/local|g' {}`
 
 ### Driver Reconfiguration
 

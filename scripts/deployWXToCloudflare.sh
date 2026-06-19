@@ -12,8 +12,6 @@ SOURCE_DIR="${SOURCE_DIR:-/Users/Shared/weewx-output}"
 BACKUP_DIR="${BACKUP_DIR:-/Users/Shared/Backup/Archive}"
 RCLONE_BIN="${RCLONE_BIN:-/usr/local/bin/rclone}"
 RCLONE_CONF="${RCLONE_CONF:-/Users/Shared/rclone/rclone.conf}"
-REMOTE_NAME="${REMOTE_NAME:-cloudflare:pcezanne-weather-backups}"
-PROJECT_NAME="${PROJECT_NAME:-wx-notthepainter}"
 LOG="${LOG:-/Library/Logs/weewx-cloudflare.out}"
 LOCKFILE="${LOCKFILE:-/tmp/weewx-deploy.lock}"
 ENV_FILE="${ENV_FILE:-/usr/local/etc/weewx/.env}"
@@ -23,6 +21,10 @@ set -a
 source "$ENV_FILE"
 set +a
 export CI=true
+
+# Values that come from .env
+REMOTE_NAME="${RCLONE_REMOTE}"
+PROJECT_NAME="${CLOUDFLARE_PROJECT_NAME}"
 
 # --- PREVENT OVERLAP ---
 if [ -e "$LOCKFILE" ]; then

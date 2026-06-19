@@ -4,10 +4,10 @@
 <plist version="1.0">
 <dict>
 
-  <!-- This should be in /Library/LaunchDaemons/com.enkilabs.weewx-cloudflare.plist -->
+  <!-- This should be in /Library/LaunchDaemons/com.weewxops.weewx-cloudflare.plist -->
 
   <key>Label</key>
-  <string>com.enkilabs.weewx-cloudflare</string>
+  <string>com.weewxops.weewx-cloudflare</string>
 
   <key>ProgramArguments</key>
   <array>

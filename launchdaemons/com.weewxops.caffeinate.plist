@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>net.pcezanne.caffeinate</string>
+    <string>com.weewxops.caffeinate</string>
     <key>ProgramArguments</key>
     <array>
         <string>/usr/bin/caffeinate</string>

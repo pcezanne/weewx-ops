@@ -21,7 +21,8 @@ sudo cp "$ENV_FILE" /usr/local/etc/weewx/.env
 sudo chmod 600 /usr/local/etc/weewx/.env
 
 echo "Installing weewx.conf (with credential substitution)..."
-envsubst '${WU_PASSWORD}' < "$SCRIPT_DIR/config/weewx.conf" | sudo tee "$WEEWX_CONF_DIR/weewx.conf" > /dev/null
+envsubst '${WU_PASSWORD} ${WU_STATION_ID} ${WEEWX_LOCATION} ${WEEWX_LATITUDE} ${WEEWX_LONGITUDE} ${WEEWX_ALTITUDE} ${ECOWITT_IP} ${CLOUDFLARE_PROJECT_NAME} ${RCLONE_REMOTE}' \
+    < "$SCRIPT_DIR/config/weewx.conf" | sudo tee "$WEEWX_CONF_DIR/weewx.conf" > /dev/null
 
 echo "Installing scripts..."
 sudo cp "$SCRIPT_DIR/scripts/deployWXToCloudflare.sh" "$WEEWX_BIN/deployWXToCloudflare.sh"
@@ -30,7 +31,7 @@ sudo cp "$SCRIPT_DIR/scripts/rotateBackups.sh" "$WEEWX_BIN/rotateBackups.sh"
 sudo chmod +x "$WEEWX_BIN/rotateBackups.sh"
 
 echo "Installing LaunchDaemons..."
-for plist in com.weewx.weewxd.plist com.enkilabs.weewx-cloudflare.plist com.enkilabs.weewx-backup.plist com.enkilabs.caffeinate.plist; do
+for plist in com.weewx.weewxd.plist com.weewxops.weewx-cloudflare.plist com.weewxops.weewx-backup.plist com.weewxops.caffeinate.plist; do
     sudo cp "$SCRIPT_DIR/launchdaemons/$plist" "$LAUNCH_DAEMONS/$plist"
     echo "  Reloading $plist..."
     sudo launchctl unload "$LAUNCH_DAEMONS/$plist" 2>/dev/null || true

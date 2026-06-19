@@ -45,8 +45,11 @@ mkdir -p "$SOURCE_DIR" "$BACKUP_DIR"
 cat > "$ENV_FILE" <<'EOF'
 CLOUDFLARE_API_TOKEN=fake_token
 CLOUDFLARE_ACCOUNT_ID=fake_account
+CLOUDFLARE_PROJECT_NAME=fake-project
+RCLONE_REMOTE=fake:fake-bucket
 HEALTHCHECK_UUID=fake-uuid
 WU_PASSWORD=fake_password
+WU_STATION_ID=KFAKE0001
 EOF
 
 run_script() {
