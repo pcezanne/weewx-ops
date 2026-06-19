@@ -3,9 +3,20 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/.env"
-WEEWX_CONF_DIR="/usr/local/etc/weewx/weewx-data"
-WEEWX_BIN="/usr/local/bin"
-LAUNCH_DAEMONS="/Library/LaunchDaemons"
+OS="$(uname -s)"
+
+if [ "$OS" = "Darwin" ]; then
+    WEEWX_CONF_DIR="/usr/local/etc/weewx/weewx-data"
+    WEEWX_BIN="/usr/local/bin"
+    PLATFORM_DIR="$SCRIPT_DIR/platform/macos"
+elif [ "$OS" = "Linux" ]; then
+    WEEWX_CONF_DIR="/etc/weewx"
+    WEEWX_BIN="/usr/local/bin"
+    PLATFORM_DIR="$SCRIPT_DIR/platform/linux"
+else
+    echo "Error: Unsupported platform: $OS"
+    exit 1
+fi
 
 if [ ! -f "$ENV_FILE" ]; then
     echo "Error: $ENV_FILE not found. Copy .env.example to .env and fill in your credentials."
@@ -30,12 +41,19 @@ sudo chmod +x "$WEEWX_BIN/deployWXToCloudflare.sh"
 sudo cp "$SCRIPT_DIR/scripts/rotateBackups.sh" "$WEEWX_BIN/rotateBackups.sh"
 sudo chmod +x "$WEEWX_BIN/rotateBackups.sh"
 
-echo "Installing LaunchDaemons..."
-for plist in com.weewx.weewxd.plist com.weewxops.weewx-cloudflare.plist com.weewxops.weewx-backup.plist com.weewxops.caffeinate.plist; do
-    sudo cp "$SCRIPT_DIR/launchdaemons/$plist" "$LAUNCH_DAEMONS/$plist"
-    echo "  Reloading $plist..."
-    sudo launchctl unload "$LAUNCH_DAEMONS/$plist" 2>/dev/null || true
-    sudo launchctl load "$LAUNCH_DAEMONS/$plist"
-done
+if [ "$OS" = "Darwin" ]; then
+    LAUNCH_DAEMONS="/Library/LaunchDaemons"
+    echo "Installing LaunchDaemons..."
+    for plist in com.weewx.weewxd.plist com.weewxops.weewx-cloudflare.plist com.weewxops.weewx-backup.plist com.weewxops.caffeinate.plist; do
+        sudo cp "$PLATFORM_DIR/$plist" "$LAUNCH_DAEMONS/$plist"
+        echo "  Reloading $plist..."
+        sudo launchctl unload "$LAUNCH_DAEMONS/$plist" 2>/dev/null || true
+        sudo launchctl load "$LAUNCH_DAEMONS/$plist"
+    done
+elif [ "$OS" = "Linux" ]; then
+    echo "Linux/systemd installation not yet implemented."
+    echo "See platform/linux/README.md for the units that need to be created."
+    exit 1
+fi
 
 echo "Done."

@@ -20,6 +20,15 @@ assert() {
     fi
 }
 
+date_offset() {
+    local days="$1"
+    if date --version >/dev/null 2>&1; then
+        date -d "-${days} days" +%Y%m%d%H%M
+    else
+        date -v-${days}d +%Y%m%d%H%M
+    fi
+}
+
 TMPDIR_TEST=$(mktemp -d)
 FAKE_DB="$TMPDIR_TEST/weewx.sdb"
 BACKUP_ROOT="$TMPDIR_TEST/backup"
@@ -50,8 +59,8 @@ echo "-- retention deletes old files --"
 OLD_DAILY="$BACKUP_ROOT/daily/weewx-2026-01-01.sdb"
 OLD_MONTHLY="$BACKUP_ROOT/monthly/weewx-month-2025-01-01.sdb"
 touch "$OLD_DAILY" "$OLD_MONTHLY"
-touch -t "$(date -v-31d +%Y%m%d%H%M)" "$OLD_DAILY"
-touch -t "$(date -v-366d +%Y%m%d%H%M)" "$OLD_MONTHLY"
+touch -t "$(date_offset 31)" "$OLD_DAILY"
+touch -t "$(date_offset 366)" "$OLD_MONTHLY"
 run "2026-06-18" "18"
 assert "old daily deleted (>30d)" "[ ! -f '$OLD_DAILY' ]"
 assert "old monthly deleted (>365d)" "[ ! -f '$OLD_MONTHLY' ]"
@@ -60,7 +69,7 @@ echo ""
 echo "-- recent files are kept --"
 RECENT_DAILY="$BACKUP_ROOT/daily/weewx-2026-06-10.sdb"
 touch "$RECENT_DAILY"
-touch -t "$(date -v-5d +%Y%m%d%H%M)" "$RECENT_DAILY"
+touch -t "$(date_offset 5)" "$RECENT_DAILY"
 run "2026-06-18" "18"
 assert "recent daily kept" "[ -f '$RECENT_DAILY' ]"
 

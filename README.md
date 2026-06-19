@@ -19,19 +19,19 @@ A high-availability, headless weather station running on Raspberry Pi or macOS. 
 The system is composed of five layers, each implemented as an independent macOS LaunchDaemon.
 
 ### Power Management
-**`launchdaemons/com.weewxops.caffeinate.plist`**
+**`platform/macos/com.weewxops.caffeinate.plist`**
 
 Keeps the Mac awake indefinitely using `caffeinate -sim` (system sleep, idle sleep, and disk sleep prevention). Required for reliable headless operation with the lid closed.
 
 ### Core Data Collection
-**`launchdaemons/com.weewx.weewxd.plist`**
+**`platform/macos/com.weewx.weewxd.plist`**
 
 Runs `weewxd` under a Python virtualenv at `/usr/local/weewx-venv`. KeepAlive ensures launchd restarts it if it exits for any reason. An explicit PATH is injected so launchd can resolve the venv binaries without a login shell.
 
 WeeWX polls the Ecowitt gateway every 20 seconds via the local HTTP API (`user.ecowitt_http` driver). Archive records are written to SQLite every 5 minutes. On startup after a gap, the driver pulls history from the gateway's SD card to backfill missing records.
 
 ### Database Backup
-**`launchdaemons/com.weewxops.weewx-backup.plist`** → **`scripts/rotateBackups.sh`**
+**`platform/macos/com.weewxops.weewx-backup.plist`** → **`scripts/rotateBackups.sh`**
 
 Runs at midnight daily. Implements a simple rotation: 30 daily copies and 12 monthly copies (promoted on the 1st). Both tiers are synced to Cloudflare R2 by the deploy script.
 
@@ -39,7 +39,7 @@ To verify a backup without WeeWX:
 `sqlite3 /path/to/backup.sdb "PRAGMA integrity_check;"`
 
 ### Event-Driven Deployment
-**`launchdaemons/com.weewxops.weewx-cloudflare.plist`** → **`scripts/deployWXToCloudflare.sh`**
+**`platform/macos/com.weewxops.weewx-cloudflare.plist`** → **`scripts/deployWXToCloudflare.sh`**
 
 Uses `WatchPaths` to monitor `deployment-complete.txt` in the WeeWX output directory. When WeeWX finishes a report cycle, it writes this sentinel file, which triggers the deploy daemon — no polling, no cron race conditions.
 
@@ -62,12 +62,13 @@ For system-level log rotation, add a newsyslog config to `/etc/newsyslog.d/` cap
 ## Repository Layout
 
 ```
-config/          WeeWX and skin configuration
-launchdaemons/   macOS LaunchDaemon plists
-scripts/         Shell scripts run by the daemons
-tests/           Self-contained bash test suites
-install.sh       Deploys everything to its live location
-.env.example     Required credentials (copy to .env and fill in)
+config/                  WeeWX and skin configuration
+platform/macos/          macOS LaunchDaemon plists
+platform/linux/          Raspberry Pi systemd units (under development)
+scripts/                 Shell scripts run by the daemons
+tests/                   Self-contained bash test suites
+install.sh               Deploys everything to its live location (platform-aware)
+.env.example             Required credentials (copy to .env and fill in)
 ```
 
 ---
@@ -132,7 +133,7 @@ The architecture is intentionally portable. The main differences on Linux:
 | Power resilience | Built-in battery (laptop) | External UPS HAT required |
 | Security flags | TCC + quarantine xattr | Standard chmod/chown |
 
-The `scripts/` and `config/` directories are platform-agnostic. Only `launchdaemons/` needs to be replaced with systemd unit files.
+The `scripts/` and `config/` directories are platform-agnostic. Only `platform/macos/` needs to be replaced with systemd unit files, which will live in `platform/linux/`. See `platform/linux/README.md` for the units that need to be written.
 
 ---
 
