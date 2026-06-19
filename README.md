@@ -7,10 +7,10 @@ A high-availability, headless weather station running on Raspberry Pi or macOS. 
 ## Project Goals
 
 - **Always on.** The system runs unattended. No human intervention should be required for normal operation. launchd keeps every service alive and restarts anything that exits. Every successful deploy cycle pings a [healthchecks.io](https://healthchecks.io) heartbeat; after a configurable number of missed pings, an alert email is sent.
-- **Resilient to network loss.** WeeWX collects and archives locally regardless of internet availability. Deployment and backup sync retry on the next cycle.
-- **Data integrity over convenience.** The SQLite database is the source of truth. Backups are rotated daily and monthly. Cloudflare R2 provides off-site redundancy.
 - **No local web server.** Weather data is published to [Cloudflare Pages](https://pages.cloudflare.com) — fast, globally distributed, and free at personal-use volumes. No nginx, no certificates, no open ports.
 - **Atomic web deployments.** The web publish step is decoupled from data collection via a filesystem sentinel file. A failed deploy never corrupts a running collection cycle.
+- **Resilient to network loss.** WeeWX collects and archives locally regardless of internet availability. Deployment and backup sync retry on the next cycle.
+- **Data integrity over convenience.** The SQLite database is the source of truth. Backups are rotated daily and monthly. Cloudflare R2 provides off-site redundancy.
 - **Portable.** Configuration is source-controlled. A rebuild from scratch should be possible from this repo plus a `.env` file.
 
 ---
