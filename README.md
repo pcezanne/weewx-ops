@@ -140,3 +140,13 @@ The `scripts/` and `config/` directories are platform-agnostic. Only `launchdaem
 
 `bash tests/test_rotate_backups.sh`
 `bash tests/test_deploy.sh`
+
+---
+
+## Authors
+
+Originally written by Google Gemini. Developed further by Anthropic Claude Code. Both directed and prompted by Paul Cezanne.
+
+## License
+
+Copyright (C) 2026 Paul Cezanne. Licensed under the [GNU General Public License v3](LICENSE).
