@@ -1,6 +1,6 @@
 # weewx-ops — WeeWX Production Operations Stack
 
-A high-availability, headless weather station running on macOS. Data is collected from an Ecowitt gateway, processed by WeeWX, and published to Cloudflare Pages. The system is designed for unattended, remote operation with off-site backups and uptime monitoring.
+A high-availability, headless weather station running on Raspberry Pi or macOS. Data is collected from an Ecowitt gateway, processed by WeeWX, and published to Cloudflare Pages. The system is designed for unattended, remote operation with off-site backups and uptime monitoring. Raspberry Pi support is under active development; macOS is the current production platform.
 
 ---
 
