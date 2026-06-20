@@ -7,6 +7,7 @@ DATE="${DATE:-$(date +%Y-%m-%d)}"
 DAY_OF_MONTH="${DAY_OF_MONTH:-$(date +%d)}"
 RCLONE_BIN="${RCLONE_BIN:-/usr/local/bin/rclone}"
 RCLONE_CONF="${RCLONE_CONF:-/Users/Shared/rclone/rclone.conf}"
+CURL_BIN="${CURL_BIN:-/usr/bin/curl}"
 ENV_FILE="${ENV_FILE:-/usr/local/etc/weewx/.env}"
 
 if [ -r "$ENV_FILE" ]; then
@@ -66,8 +67,8 @@ fi
 
 if [ -n "${BACKUP_HEALTHCHECK_UUID:-}" ]; then
     if $sync_failed; then
-        /usr/bin/curl -fsS -m 10 --retry 5 "https://hc-ping.com/${BACKUP_HEALTHCHECK_UUID}/fail" > /dev/null || true
+        "$CURL_BIN" -fsS -m 10 --retry 5 "https://hc-ping.com/${BACKUP_HEALTHCHECK_UUID}/fail" > /dev/null || true
     else
-        /usr/bin/curl -fsS -m 10 --retry 5 "https://hc-ping.com/${BACKUP_HEALTHCHECK_UUID}" > /dev/null || true
+        "$CURL_BIN" -fsS -m 10 --retry 5 "https://hc-ping.com/${BACKUP_HEALTHCHECK_UUID}" > /dev/null || true
     fi
 fi

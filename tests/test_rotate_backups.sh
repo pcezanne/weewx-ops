@@ -80,5 +80,43 @@ DB_SRC="/nonexistent/weewx.sdb" BACKUP_DIR="$BACKUP_ROOT" DATE="2026-06-18" DAY_
 assert "exits non-zero on missing DB" "[ ${result:-0} -ne 0 ]"
 
 echo ""
+echo "-- healthcheck: success ping when no sync configured --"
+MOCK_BIN="$TMPDIR_TEST/bin"
+mkdir -p "$MOCK_BIN"
+PING_LOG="$TMPDIR_TEST/ping.log"
+cat > "$MOCK_BIN/curl" <<MOCKEOF
+#!/bin/bash
+echo "\$@" >> "$PING_LOG"
+MOCKEOF
+cat > "$MOCK_BIN/sleep" <<'MOCKEOF'
+#!/bin/bash
+exit 0
+MOCKEOF
+chmod +x "$MOCK_BIN/curl" "$MOCK_BIN/sleep"
+DB_SRC="$FAKE_DB" BACKUP_DIR="$BACKUP_ROOT" DATE="2026-06-18" DAY_OF_MONTH="18" \
+    RCLONE_REMOTE="" BACKUP_HEALTHCHECK_UUID="test-uuid" CURL_BIN="$MOCK_BIN/curl" \
+    bash "$SCRIPT" > /dev/null
+assert "pings success (not /fail) when sync not configured" \
+    "grep -q 'test-uuid' '$PING_LOG' && ! grep -q 'test-uuid/fail' '$PING_LOG'"
+
+echo ""
+echo "-- healthcheck: /fail ping when sync fails --"
+PING_LOG2="$TMPDIR_TEST/ping2.log"
+cat > "$MOCK_BIN/curl" <<MOCKEOF
+#!/bin/bash
+echo "\$@" >> "$PING_LOG2"
+MOCKEOF
+cat > "$MOCK_BIN/rclone" <<'MOCKEOF'
+#!/bin/bash
+exit 1
+MOCKEOF
+chmod +x "$MOCK_BIN/curl" "$MOCK_BIN/rclone"
+DB_SRC="$FAKE_DB" BACKUP_DIR="$BACKUP_ROOT" DATE="2026-06-18" DAY_OF_MONTH="18" \
+    RCLONE_REMOTE="fake:bucket" RCLONE_BIN="$MOCK_BIN/rclone" \
+    BACKUP_HEALTHCHECK_UUID="test-uuid" CURL_BIN="$MOCK_BIN/curl" \
+    PATH="$MOCK_BIN:$PATH" bash "$SCRIPT" > /dev/null 2>&1 || true
+assert "pings /fail when sync fails" "grep -q 'test-uuid/fail' '$PING_LOG2'"
+
+echo ""
 echo "Results: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
