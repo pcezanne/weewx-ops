@@ -7,10 +7,12 @@ OS="$(uname -s)"
 
 if [ "$OS" = "Darwin" ]; then
     WEEWX_CONF_DIR="/usr/local/etc/weewx/weewx-data"
+    WEEWX_ENV_DEST="/usr/local/etc/weewx/.env"
     WEEWX_BIN="/usr/local/bin"
     PLATFORM_DIR="$SCRIPT_DIR/platform/macos"
 elif [ "$OS" = "Linux" ]; then
     WEEWX_CONF_DIR="/etc/weewx"
+    WEEWX_ENV_DEST="/etc/weewx/.env"
     WEEWX_BIN="/usr/local/bin"
     PLATFORM_DIR="$SCRIPT_DIR/platform/linux"
 else
@@ -27,10 +29,10 @@ set -a
 source "$ENV_FILE"
 set +a
 
-echo "Installing .env to $WEEWX_CONF_DIR/.env..."
-sudo mkdir -p "$WEEWX_CONF_DIR"
-sudo cp "$ENV_FILE" "$WEEWX_CONF_DIR/.env"
-sudo chmod 600 "$WEEWX_CONF_DIR/.env"
+echo "Installing .env to $WEEWX_ENV_DEST..."
+sudo mkdir -p "$(dirname "$WEEWX_ENV_DEST")"
+sudo cp "$ENV_FILE" "$WEEWX_ENV_DEST"
+sudo chmod 600 "$WEEWX_ENV_DEST"
 
 echo "Installing weewx.conf (with credential substitution)..."
 envsubst '${WU_PASSWORD} ${WU_STATION_ID} ${WEEWX_LOCATION} ${WEEWX_LATITUDE} ${WEEWX_LONGITUDE} ${WEEWX_ALTITUDE} ${ECOWITT_IP} ${CLOUDFLARE_PROJECT_NAME} ${RCLONE_REMOTE}' \
